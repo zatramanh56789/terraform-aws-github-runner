@@ -60,5 +60,5 @@ resource "aws_apigatewayv2_integration" "webhook" {
 resource "aws_ssm_parameter" "queues_config" {
   name  = "${var.ssm_paths.root}/queues-config"
   type  = "String"
-  value = jsonencode(var.queues_config)
+  value = jsonencode(local.queues_config_sorted)
 }

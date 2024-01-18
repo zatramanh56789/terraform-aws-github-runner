@@ -29,7 +29,6 @@ resource "aws_lambda_function" "webhook" {
       POWERTOOLS_TRACER_CAPTURE_ERROR          = var.tracing_config.capture_error
       PARAMETER_GITHUB_APP_WEBHOOK_SECRET      = var.github_app_parameters.webhook_secret.name
       REPOSITORY_WHITE_LIST                    = jsonencode(var.repository_white_list)
-      RUNNER_CONFIG                            = jsonencode(local.queues_config_sorted)
       SQS_WORKFLOW_JOB_QUEUE                   = try(var.sqs_workflow_job_queue, null) != null ? var.sqs_workflow_job_queue.id : ""
       PARAMETER_QUEUES_CONFIG_PATH             = aws_ssm_parameter.queues_config.name
     }
