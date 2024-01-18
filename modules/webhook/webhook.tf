@@ -1,9 +1,9 @@
 locals {
   # config with combined key and order
-  runner_config = { for k, v in var.runner_config : format("%03d-%s", v.matcherConfig.priority, k) => merge(v, { key = k }) }
+  queues_config = { for k, v in var.queues_config : format("%03d-%s", v.matcherConfig.priority, k) => merge(v, { key = k }) }
 
   # sorted list
-  runner_config_sorted = [for k in sort(keys(local.runner_config)) : local.runner_config[k]]
+  queues_config_sorted = [for k in sort(keys(local.queues_config)) : local.queues_config[k]]
 }
 
 
@@ -29,7 +29,7 @@ resource "aws_lambda_function" "webhook" {
       POWERTOOLS_TRACER_CAPTURE_ERROR          = var.tracing_config.capture_error
       PARAMETER_GITHUB_APP_WEBHOOK_SECRET      = var.github_app_parameters.webhook_secret.name
       REPOSITORY_WHITE_LIST                    = jsonencode(var.repository_white_list)
-      RUNNER_CONFIG                            = jsonencode(local.runner_config_sorted)
+      RUNNER_CONFIG                            = jsonencode(local.queues_config_sorted)
       SQS_WORKFLOW_JOB_QUEUE                   = try(var.sqs_workflow_job_queue, null) != null ? var.sqs_workflow_job_queue.id : ""
       PARAMETER_QUEUES_CONFIG_PATH             = aws_ssm_parameter.queues_config.name
     }
