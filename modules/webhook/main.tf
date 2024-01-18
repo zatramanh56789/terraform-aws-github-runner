@@ -55,3 +55,10 @@ resource "aws_apigatewayv2_integration" "webhook" {
   integration_method = "POST"
   integration_uri    = aws_lambda_function.webhook.invoke_arn
 }
+
+
+resource "aws_ssm_parameter" "queues_config" {
+  name  = "/${var.ssm_paths.root}/queues-config"
+  type  = "String"
+  value = jsonencode(var.queues_config)
+}

@@ -1,15 +1,28 @@
+import { getParameter } from '@terraform-aws-github-runner/aws-ssm-util';
 import { QueueConfig } from './sqs';
 
 export class Config {
-  public repositoryAllowList: Array<string>;
-  public queuesConfig: Array<QueueConfig>;
-  public workflowJobEventSecondaryQueue;
+  repositoryAllowList: Array<string>;
+  queuesConfig: Array<QueueConfig>;
+  workflowJobEventSecondaryQueue: string | undefined;
 
-  constructor() {
-    const repositoryAllowListEnv = process.env.REPOSITORY_ALLOW_LIST || '[]';
-    this.repositoryAllowList = JSON.parse(repositoryAllowListEnv) as Array<string>;
-    const queuesConfigEnv = process.env.RUNNER_CONFIG || '[]';
-    this.queuesConfig = JSON.parse(queuesConfigEnv) as Array<QueueConfig>;
-    this.workflowJobEventSecondaryQueue = process.env.SQS_WORKFLOW_JOB_QUEUE || undefined;
+  constructor(
+    repositoryAllowList: Array<string>,
+    queuesConfig: Array<QueueConfig>,
+    workflowJobEventSecondaryQueue: string | undefined,
+  ) {
+    this.repositoryAllowList = repositoryAllowList;
+    this.queuesConfig = queuesConfig;
+    this.workflowJobEventSecondaryQueue = workflowJobEventSecondaryQueue;
+  }
+
+  static async load(): Promise<Config> {
+    const repositoryAllowListEnv = process.env.REPOSITORY_ALLOW_LIST ?? '[]';
+    const repositoryAllowList = JSON.parse(repositoryAllowListEnv) as Array<string>;
+    const queuesConfigPath = process.env.PARAMETER_RUNNER_CONFIG_PATH ?? '/github-runner/queues-config';
+    const queuesConfigVal = await getParameter(queuesConfigPath);
+    const queuesConfig = JSON.parse(queuesConfigVal) as Array<QueueConfig>;
+    const workflowJobEventSecondaryQueue = process.env.SQS_WORKFLOW_JOB_QUEUE ?? undefined;
+    return new Config(repositoryAllowList, queuesConfig, workflowJobEventSecondaryQueue);
   }
 }

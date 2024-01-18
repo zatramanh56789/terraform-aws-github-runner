@@ -31,6 +31,7 @@ resource "aws_lambda_function" "webhook" {
       REPOSITORY_WHITE_LIST                    = jsonencode(var.repository_white_list)
       RUNNER_CONFIG                            = jsonencode(local.runner_config_sorted)
       SQS_WORKFLOW_JOB_QUEUE                   = try(var.sqs_workflow_job_queue, null) != null ? var.sqs_workflow_job_queue.id : ""
+      PARAMETER_QUEUES_CONFIG_PATH             = aws_ssm_parameter.queues_config.name
     }
   }
 
@@ -105,7 +106,7 @@ resource "aws_iam_role_policy" "webhook_sqs" {
   role = aws_iam_role.webhook_lambda.name
 
   policy = templatefile("${path.module}/policies/lambda-publish-sqs-policy.json", {
-    sqs_resource_arns = jsonencode([for k, v in var.runner_config : v.arn])
+    sqs_resource_arns = jsonencode([for k, v in var.queues_config : v.arn])
     kms_key_arn       = var.kms_key_arn != null ? var.kms_key_arn : ""
   })
 }
@@ -127,6 +128,7 @@ resource "aws_iam_role_policy" "webhook_ssm" {
 
   policy = templatefile("${path.module}/policies/lambda-ssm.json", {
     github_app_webhook_secret_arn = var.github_app_parameters.webhook_secret.arn,
+    parameter_queues_config_arn   = aws_ssm_parameter.queues_config.arn
   })
 }
 

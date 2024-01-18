@@ -123,12 +123,14 @@ module "ssm" {
 
 module "webhook" {
   source = "./modules/webhook"
-
+  ssm_paths = {
+    root = "${local.ssm_root_path}"
+  }
   prefix      = var.prefix
   tags        = local.tags
   kms_key_arn = var.kms_key_arn
 
-  runner_config = {
+  queues_config = {
     (aws_sqs_queue.queued_builds.id) = {
       id : aws_sqs_queue.queued_builds.id
       arn : aws_sqs_queue.queued_builds.arn

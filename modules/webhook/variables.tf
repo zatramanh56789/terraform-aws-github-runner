@@ -22,8 +22,8 @@ variable "tags" {
   default     = {}
 }
 
-variable "runner_config" {
-  description = "SQS queue to publish accepted build events based on the runner type. When exact match is disabled the webhook accecpts the event if one of the workflow job labels is part of the matcher. The priority defines the order the matchers are applied."
+variable "queues_config" {
+  description = "SQS queue to publish accepted build events based on the runner type. When exact match is disabled the webhook accepts the event if one of the workflow job labels is part of the matcher. The priority defines the order the matchers are applied."
   type = map(object({
     arn  = string
     id   = string
@@ -35,7 +35,7 @@ variable "runner_config" {
     })
   }))
   validation {
-    condition     = try(var.runner_config.matcherConfig.priority, 999) >= 0 && try(var.runner_config.matcherConfig.priority, 999) < 1000
+    condition     = try(var.queues_config.matcherConfig.priority, 999) >= 0 && try(var.queues_config.matcherConfig.priority, 999) < 1000
     error_message = "The priority of the matcher must be between 0 and 999."
   }
 }
@@ -179,4 +179,11 @@ variable "tracing_config" {
     capture_error         = optional(bool, false)
   })
   default = {}
+}
+
+variable "ssm_paths" {
+  description = "The root path used in SSM to store configuration and secrets."
+  type = object({
+    root = string
+  })
 }
