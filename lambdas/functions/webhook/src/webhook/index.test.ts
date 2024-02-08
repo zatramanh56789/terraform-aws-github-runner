@@ -602,6 +602,7 @@ async function createConfig(repositoryAllowList?: string[], runnerConfig?: Runne
   if (repositoryAllowList) {
     process.env.REPOSITORY_ALLOW_LIST = JSON.stringify(repositoryAllowList);
   }
+  Config.reset();
   mockSSMResponse(runnerConfig);
   return await Config.load();
 }

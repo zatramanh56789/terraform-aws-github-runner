@@ -4,7 +4,7 @@ import { logger } from '@terraform-aws-github-runner/aws-powertools-util';
 
 export class Config {
   repositoryAllowList: Array<string>;
-  static queuesConfig: Array<QueueConfig>;
+  static queuesConfig: Array<QueueConfig> | undefined;
   workflowJobEventSecondaryQueue: string | undefined;
 
   constructor(repositoryAllowList: Array<string>, workflowJobEventSecondaryQueue: string | undefined) {
@@ -25,5 +25,9 @@ export class Config {
     }
     const workflowJobEventSecondaryQueue = process.env.SQS_WORKFLOW_JOB_QUEUE ?? undefined;
     return new Config(repositoryAllowList, workflowJobEventSecondaryQueue);
+  }
+
+  static reset(): void {
+    Config.queuesConfig = undefined;
   }
 }

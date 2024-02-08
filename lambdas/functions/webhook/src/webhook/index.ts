@@ -21,7 +21,7 @@ export async function handle(headers: IncomingHttpHeaders, body: string, config:
 
   validateRepoInAllowList(event, config);
 
-  const response = await handleWorkflowJob(event, eventType, Config.queuesConfig);
+  const response = await handleWorkflowJob(event, eventType, Config.queuesConfig!);
   await sendWebhookEventToWorkflowJobQueue({ workflowJobEvent: event }, config);
   return response;
 }
