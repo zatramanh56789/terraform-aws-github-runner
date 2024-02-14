@@ -610,7 +610,7 @@ function mockSSMResponse(runnerConfigInput?: RunnerConfig) {
   const mockedGet = mocked(getParameter);
   mockedGet.mockImplementation((parameter_name) => {
     const value =
-      parameter_name == '/github-runner/queues-config'
+      parameter_name == '/github-runner/runner-matcher-config'
         ? JSON.stringify(runnerConfigInput ?? runnerConfig)
         : GITHUB_APP_WEBHOOK_SECRET;
     return Promise.resolve(value);
