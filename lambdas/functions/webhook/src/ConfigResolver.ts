@@ -19,14 +19,14 @@ export class Config {
     const repositoryAllowList = JSON.parse(repositoryAllowListEnv) as Array<string>;
     // load the queues config from SSM if it's not already loaded and cached
     if (!Config.matcherConfig) {
-      const queuesConfigPath =
+      const matcherConfigPath =
         process.env.PARAMETER_RUNNER_MATCHER_CONFIG_PATH ?? '/github-runner/runner-matcher-config';
-      const [queuesConfigVal, webhookSecret] = await Promise.all([
-        getParameter(queuesConfigPath),
+      const [matcherConfigVal, webhookSecret] = await Promise.all([
+        getParameter(matcherConfigPath),
         getParameter(process.env.PARAMETER_GITHUB_APP_WEBHOOK_SECRET),
       ]);
       Config.webhookSecret = webhookSecret;
-      Config.matcherConfig = JSON.parse(queuesConfigVal) as Array<RunnerMatcherConfig>;
+      Config.matcherConfig = JSON.parse(matcherConfigVal) as Array<RunnerMatcherConfig>;
       logger.debug('Loaded queues config', { matcherConfig: Config.matcherConfig });
     }
     const workflowJobEventSecondaryQueue = process.env.SQS_WORKFLOW_JOB_QUEUE ?? undefined;
