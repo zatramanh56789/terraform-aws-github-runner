@@ -1,9 +1,9 @@
 locals {
   # config with combined key and order
-  queues_config = { for k, v in var.queues_config : format("%03d-%s", v.matcherConfig.priority, k) => merge(v, { key = k }) }
+  runner_matcher_config = { for k, v in var.runner_matcher_config : format("%03d-%s", v.matcherConfig.priority, k) => merge(v, { key = k }) }
 
   # sorted list
-  queues_config_sorted = [for k in sort(keys(local.queues_config)) : local.queues_config[k]]
+  runner_matcher_config_sorted = [for k in sort(keys(local.runner_matcher_config)) : local.runner_matcher_config[k]]
 }
 
 
@@ -111,7 +111,7 @@ resource "aws_iam_role_policy" "webhook_sqs" {
   role = aws_iam_role.webhook_lambda.name
 
   policy = templatefile("${path.module}/policies/lambda-publish-sqs-policy.json", {
-    sqs_resource_arns = jsonencode([for k, v in var.queues_config : v.arn])
+    sqs_resource_arns = jsonencode([for k, v in var.runner_matcher_config : v.arn])
     kms_key_arn       = var.kms_key_arn != null ? var.kms_key_arn : ""
   })
 }
@@ -132,8 +132,8 @@ resource "aws_iam_role_policy" "webhook_ssm" {
   role = aws_iam_role.webhook_lambda.name
 
   policy = templatefile("${path.module}/policies/lambda-ssm.json", {
-    github_app_webhook_secret_arn = var.github_app_parameters.webhook_secret.arn,
-    parameter_queues_config_arn   = aws_ssm_parameter.runner_matcher_config.arn
+    github_app_webhook_secret_arn       = var.github_app_parameters.webhook_secret.arn,
+    parameter_runner_matcher_config_arn = aws_ssm_parameter.runner_matcher_config.arn
   })
 }
 

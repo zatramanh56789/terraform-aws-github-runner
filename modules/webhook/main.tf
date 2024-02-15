@@ -58,7 +58,7 @@ resource "aws_apigatewayv2_integration" "webhook" {
 
 
 resource "aws_ssm_parameter" "runner_matcher_config" {
-  name  = "${var.ssm_paths.root}/runner-matcher-config"
+  name  = "${var.ssm_paths.root}/${var.ssm_paths.webhook}/runner-matcher-config"
   type  = "String"
-  value = jsonencode(local.queues_config_sorted)
+  value = jsonencode(local.runner_matcher_config_sorted)
 }
